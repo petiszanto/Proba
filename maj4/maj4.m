@@ -1,0 +1,32 @@
+W = tf(2, [2 1]) * tf(1, [1 1 1]);
+A = [-1/2 0 0; 0 0 1; 1 -1 -1];
+B = [1;0;0];
+C = [0 1 0];
+D = 0;
+sys = ss(A, B, C, D); %Ezt a parancsablakba
+G = eig(sys.a); %Eztis
+%simulink
+Vmi = A*B;
+Vmi2 = A^2*B;
+Mc = [B A*B A^2*B];
+Mc = ctrb(sys);
+Vmi3 = rank(Mc);
+Mo = [C; C*A; C*A^2];
+Mo = obsv(sys);
+Vmi4 = (Mo);
+A2 = [0 1; 2 1];
+B2 = [1; 2];
+C2 = [1 0];
+Mc2 = ctrb(A2, B2);
+Vmi5 = rank(Mc2);
+Mo2 = obsv(A2, C2);
+Vmi6 = rank(Mo2);
+Vmi7 = damp(sys); %inkább c.w-be
+xi = sqrt(2)/2; w0 = 2;
+s1 = -xi*w0 + j*w0*sqrt(1-xi^2);
+s2 = conj(s1);
+s3 = -10;
+K = acker(A, B, [s1 s2 s3]);
+Nxu = inv([A B; C 0])*[0;0;0;1];
+Nx = Nxu(1:3);
+Nu = Nxu(end);

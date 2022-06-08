@@ -1,0 +1,38 @@
+W = tf(1, [1 0.1 1 0]);
+Ts = 0.2;
+D = c2d(W, Ts, 'zoh');
+B = D.num{1};
+B = B(2:end);
+A = D.den{1};
+Gyok = roots(B);
+Bplus = 1; Bminus = B;
+grBminus = length(Bminus) - 1;
+grA = length(A) - 1;
+l = 0;
+grAm = 1 + grBminus;
+grS = grA + 1 - 1;
+grR1v = grBminus;
+xi = 0.7; w0 = 1; xio = 0.7; w0o = 5;
+s1 = -xi*w0 + j*w0*sqrt(1-xi^2);
+s2 = conj(s1);
+scinf = -3*w0;
+s1o = -xio*w0o + j*w0o*sqrt(1-xio^2);
+s2o = conj(s1o);
+z1 = exp(s1*Ts); z2 = exp(s2*Ts);
+zcinf = exp(scinf*Ts);
+z1o = exp(s1o*Ts); z2o = exp(s2o*Ts);
+Am = poly([z1 z2 zcinf]);
+Ao = poly([z1o z2o]);
+Bmv = polyval(Am, 1)/polyval(Bminus, 1);
+T = Bmv*Ao;
+AA = A;
+BB = Bminus;
+CC = conv(Am, Ao);
+DM = [[AA';0] [0; AA']...]
+    [BB';0;0] [0;BB';0] [0;0;BB']];
+DV = CC(2:end)'-[AA(2:end)';0;0];
+sol = inv(DM)*DV;
+R1v = [1 sol(1:2)'];
+R = R1v;
+S = sol(3:end)';
+
